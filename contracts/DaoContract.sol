@@ -75,6 +75,8 @@ contract Governance {
     // To store a particular users' claims
     mapping(address => uint256[]) internal userClaims;
 
+    mapping(address => uint256[]) public userVotedFor;
+
     function countVotes(address _contract, address _userAddress)
         public
         view
@@ -151,12 +153,14 @@ contract Governance {
         } else if (now <= proposalsMapping[_proposalId].endTime) {
             if (_vote == false) {
                 proposalsMapping[_proposalId].noVotes += 1;
+                userVotedFor[msg.sender].push(_proposalId);
                 return (
                     proposalsMapping[_proposalId].yesVotes,
                     proposalsMapping[_proposalId].noVotes
                 );
             } else if (_vote == true) {
                 proposalsMapping[_proposalId].yesVotes += 1;
+                userVotedFor[msg.sender].push(_proposalId);
                 return (
                     proposalsMapping[_proposalId].yesVotes,
                     proposalsMapping[_proposalId].noVotes
