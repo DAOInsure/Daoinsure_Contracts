@@ -13,6 +13,17 @@ interface ISendClaimAmount {
     function withdrawAmount(address _recipient, uint256 _amount) external;
 }
 
+interface IChainlinkData {
+    function requestWeatherData(
+        string calldata _lat,
+        string calldata _lon,
+        string calldata _dt,
+        uint256 proposalId
+    ) external returns (bytes32);
+
+    function getRain() external returns (uint256);
+}
+
 contract Governance {
     // 🚨 Address of ISuperToken needs to be initialised after contract deployment
     address public daoInsureTokenAddress;
@@ -21,6 +32,8 @@ contract Governance {
     uint256 public proposalIdNumber;
 
     int256 public daoMemberCount;
+
+    IChainlinkData chainlinkContract;
 
     uint256[] public arr;
 
@@ -35,6 +48,8 @@ contract Governance {
         bool passed;
         uint256 endTime;
         string ipfsHash;
+        string dateOfIncident;
+        uint256 rainData;
     }
 
     struct Member {
@@ -45,9 +60,10 @@ contract Governance {
         uint256 proposals;
     }
 
-    constructor() public {
+    constructor(address _add) public {
         proposalIdNumber = 0;
         daoMemberCount = 0;
+        chainlinkContract = IChainlinkData(_add);
     }
 
     modifier daoMember() {
@@ -101,10 +117,26 @@ contract Governance {
         return countVotes(daoInsureTokenAddress, _member);
     }
 
+    // function getRain() public returns (uint256) {
+    //     // return chainlinkContract().rain();
+    // }
+
+    function setRain(uint256 _proposalId, uint256 _rain) public {
+        proposalsMapping[_proposalId].rainData = _rain;
+    }
+
     function createProposal(
         string memory _proposalString,
+        string memory _dt,
         string memory _ipfsHash
     ) public daoMember {
+        chainlinkContract.requestWeatherData(
+            "19.0434",
+            "72.8593",
+            "1628047190",
+            proposalIdNumber
+        );
+
         proposalsMapping[proposalIdNumber] = Proposal({
             proposalId: proposalIdNumber,
             userAddress: msg.sender,
@@ -115,14 +147,13 @@ contract Governance {
             voting: true,
             passed: false,
             endTime: (now + 3 minutes),
-            ipfsHash: _ipfsHash
+            ipfsHash: _ipfsHash,
+            dateOfIncident: _dt,
+            rainData: 0
         });
 
         userClaims[msg.sender].push(proposalIdNumber);
         proposalIdNumber += 1;
-
-        //
-        //   varia = Interface(address).getweather(lat, long);
     }
 
     function returnUserClaims(address _add)
