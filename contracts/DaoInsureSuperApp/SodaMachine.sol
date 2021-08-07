@@ -16,8 +16,8 @@ import {IERC20} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blo
 interface IAddMember {
     function addDaoMember(
         address _memberAddress,
-        int256 _lat,
-        int256 _long
+        string calldata _lat,
+        string calldata _long
     ) external;
 }
 
@@ -35,8 +35,8 @@ contract SodaMachine is Simple777Recipient, SuperAppBase {
     // Added by Shrey
     address public daoContractAddress;
     IERC20 public fDai = IERC20(0x88271d333C72e51516B67f5567c728E702b3eeE8);
-    mapping(address => int256) internal latitude;
-    mapping(address => int256) internal longitude;
+    mapping(address => string) internal latitude;
+    mapping(address => string) internal longitude;
 
     constructor(
         ISuperfluid host,
@@ -141,8 +141,8 @@ contract SodaMachine is Simple777Recipient, SuperAppBase {
 
     function addMemberToDao(
         address _address,
-        int256 _lat,
-        int256 _long
+        string memory _lat,
+        string memory _long
     ) public {
         IAddMember(daoContractAddress).addDaoMember(_address, _lat, _long);
     }
@@ -156,7 +156,7 @@ contract SodaMachine is Simple777Recipient, SuperAppBase {
         daoContractAddress = _address;
     }
 
-    function setCoordinates(int256 lat, int256 long) public {
+    function setCoordinates(string memory lat, string memory long) public {
         latitude[msg.sender] = lat;
         longitude[msg.sender] = long;
     }

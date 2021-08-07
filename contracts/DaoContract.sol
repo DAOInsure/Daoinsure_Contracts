@@ -54,8 +54,8 @@ contract Governance {
 
     struct Member {
         address memberAddress;
-        int256 lat;
-        int256 long;
+        string lat;
+        string long;
         uint256 votes;
         uint256 proposals;
     }
@@ -239,8 +239,8 @@ contract Governance {
     // 🚨 Need to add modifier to restrict access + add a return + consider any other require
     function addDaoMember(
         address _memberAddress,
-        int256 _lat,
-        int256 _long
+        string memory _lat,
+        string memory _long
     ) public {
         daoMemberMapping[_memberAddress] = Member({
             memberAddress: _memberAddress,
