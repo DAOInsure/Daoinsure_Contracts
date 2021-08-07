@@ -130,10 +130,11 @@ contract Governance {
         string memory _dt,
         string memory _ipfsHash
     ) public daoMember {
+        // chainlinkContract.requestWeatherData("19.0434", "72.8593", "1628047190", proposalIdNumber);
         chainlinkContract.requestWeatherData(
-            "19.0434",
-            "72.8593",
-            "1628047190",
+            daoMemberMapping[msg.sender].lat,
+            daoMemberMapping[msg.sender].long,
+            _dt,
             proposalIdNumber
         );
 
@@ -154,6 +155,9 @@ contract Governance {
 
         userClaims[msg.sender].push(proposalIdNumber);
         proposalIdNumber += 1;
+        daoMemberMapping[msg.sender].proposals =
+            daoMemberMapping[msg.sender].proposals +
+            1;
     }
 
     function returnUserClaims(address _add)
